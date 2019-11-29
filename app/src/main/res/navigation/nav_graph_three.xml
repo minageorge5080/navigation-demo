@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_three"
+    app:startDestination="@id/dest_nine">
+    <fragment
+        android:id="@+id/dest_nine"
+        android:name="com.minageorge.navigationdemo.ui.host.fragments.NineFragment"
+        android:label="Fragment Nine" >
+        <action
+            android:id="@+id/action_dest_nine_to_dest_ten"
+            app:destination="@id/dest_ten" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dest_ten"
+        android:name="com.minageorge.navigationdemo.ui.host.fragments.TenFragment"
+        android:label="Fragment Ten" />
+    <action android:id="@+id/action_global_dest_ten" app:destination="@id/dest_ten"/>
+</navigation>

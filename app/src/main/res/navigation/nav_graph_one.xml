@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_one"
+    app:startDestination="@id/dest_one">
+
+    <fragment
+        android:id="@+id/dest_one"
+        android:name="com.minageorge.navigationdemo.ui.host.fragments.OneFragment"
+        android:label="Fragment One">
+        <action
+            android:id="@+id/action_dest_one_to_dest_four"
+            app:destination="@id/dest_four" />
+    </fragment>
+    <fragment
+        android:id="@+id/dest_four"
+        android:name="com.minageorge.navigationdemo.ui.host.fragments.FourFragment"
+        android:label="Fragment Four">
+        <action
+            android:id="@+id/action_dest_four_to_dest_five"
+            app:destination="@id/dest_five" />
+    </fragment>
+    <fragment
+        android:id="@+id/dest_five"
+        android:name="com.minageorge.navigationdemo.ui.host.fragments.FiveFragment"
+        android:label="Fragment Five">
+        <action
+            android:id="@+id/action_dest_five_to_dest_six"
+            app:destination="@id/dest_six" />
+    </fragment>
+    <fragment
+        android:id="@+id/dest_six"
+        android:name="com.minageorge.navigationdemo.ui.host.fragments.SixFragment"
+        android:label="Fragment Six" >
+        <argument
+            android:name="sourceType"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_dest_six"
+        app:destination="@id/dest_six" />
+</navigation>

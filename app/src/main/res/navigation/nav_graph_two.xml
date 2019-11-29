@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_graph_two"
+    app:startDestination="@id/dest_seven">
+    <fragment
+        android:id="@+id/dest_seven"
+        android:name="com.minageorge.navigationdemo.ui.host.fragments.SevenFragment"
+        android:label="Fragment Seven" >
+        <action
+            android:id="@+id/action_dest_seven_to_dest_eight"
+            app:destination="@id/dest_eight" />
+    </fragment>
+    <fragment
+        android:id="@+id/dest_eight"
+        android:name="com.minageorge.navigationdemo.ui.host.fragments.EightFragment"
+        android:label="Fragment Eight" />
+</navigation>
