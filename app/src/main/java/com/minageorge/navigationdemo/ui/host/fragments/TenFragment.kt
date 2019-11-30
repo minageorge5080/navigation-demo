@@ -18,7 +18,6 @@ class TenFragment : BaseFragment() {
                 R.id.nav_host_one,
                 R.id.action_global_dest_six,
                 Bundle().apply { putInt("sourceType", 1) })
-            navController?.popBackStack()
         }
     }
 }

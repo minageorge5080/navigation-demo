@@ -9,11 +9,14 @@ import androidx.viewpager.widget.ViewPager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.minageorge.navigationdemo.R
 import com.minageorge.navigationdemo.base.BaseActivity
-import com.minageorge.navigationdemo.store.NavigateToAnotherGraph
+import com.minageorge.navigationdemo.store.ActivityBackPressed
+import com.minageorge.navigationdemo.store.FragmentBackPressed
+import com.minageorge.navigationdemo.store.OnNavigateToAnotherGraph
 import com.minageorge.navigationdemo.ui.host.containers.OneContainer
 import com.minageorge.navigationdemo.ui.host.containers.ThreeContainer
 import com.minageorge.navigationdemo.ui.host.containers.TwoContainer
 import com.minageorge.navigationdemo.utils.EventBus
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
@@ -37,6 +40,7 @@ class MainActivity : BaseActivity(), ViewPager.OnPageChangeListener,
     private val pagerAdapter = ViewPagerAdapter()
 
     private var canExit: Boolean = false
+    private var canProcessBackOperation: Boolean = true
 
     override fun getLayoutId() = R.layout.activity_main
 
@@ -54,11 +58,14 @@ class MainActivity : BaseActivity(), ViewPager.OnPageChangeListener,
 
         if (backStack.empty()) backStack.push(0)
 
-        addToDisposable(
-            EventBus.listen(NavigateToAnotherGraph::class.java)
+        addToDisposable(EventBus.listen(OnNavigateToAnotherGraph::class.java)
             .subscribe {
                 it?.let { viewPager.currentItem = it.graphPage }
             })
+
+        addToDisposable(EventBus.listen(ActivityBackPressed::class.java)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { canProcessBackOperation = it.canBack })
     }
 
     override fun onPageScrollStateChanged(state: Int) {
@@ -88,8 +95,23 @@ class MainActivity : BaseActivity(), ViewPager.OnPageChangeListener,
     }
 
     override fun onBackPressed() {
-        val fragment = fragments[viewPager.currentItem]
-        val hadNestedFragments = fragment.onBackPressed()
+        EventBus.publish(FragmentBackPressed())
+        if (canProcessBackOperation) {
+            val fragment = fragments[viewPager.currentItem]
+            val hadNestedFragments = fragment.onBackPressed()
+            if (!hadNestedFragments) {
+                if (!canExit) {
+                    Toast.makeText(
+                        this,
+                        "please press again to exit.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    canExit = true
+                } else {
+                    finish()
+                }
+            }
+        }
         // if no fragments were popped
 //        if (!hadNestedFragments) {
 //            if (backStack.size > 1) {
@@ -101,14 +123,7 @@ class MainActivity : BaseActivity(), ViewPager.OnPageChangeListener,
 //            } else super.onBackPressed()
 //        }
 
-        if (!hadNestedFragments) {
-            if (!canExit) {
-                Toast.makeText(this, "please press again to exit.", Toast.LENGTH_SHORT).show()
-                canExit = true
-            } else {
-                finish()
-            }
-        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

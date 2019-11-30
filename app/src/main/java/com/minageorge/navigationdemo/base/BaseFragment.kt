@@ -16,9 +16,13 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import com.minageorge.navigationdemo.R
-import com.minageorge.navigationdemo.store.NavigateToAnotherGraph
+import com.minageorge.navigationdemo.store.ActivityBackPressed
+import com.minageorge.navigationdemo.store.FragmentBackPressed
+import com.minageorge.navigationdemo.store.OnNavigateToAnotherGraph
 import com.minageorge.navigationdemo.store.rootDestinations
 import com.minageorge.navigationdemo.utils.EventBus
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 
 abstract class BaseFragment : Fragment() {
 
@@ -26,6 +30,7 @@ abstract class BaseFragment : Fragment() {
     var toolbar: Toolbar? = null
     var navController: NavController? = null
 
+    private val disposable = CompositeDisposable()
     private val appBarConfig = AppBarConfiguration.Builder(rootDestinations).build()
 
     @LayoutRes
@@ -50,7 +55,18 @@ abstract class BaseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        addToDisposable(EventBus.listen(FragmentBackPressed::class.java).subscribe {
+            it?.let {
+                onActivityBackPressed()
+            }
+        })
+        canProcessBackFromActivity(true)
         initFragment()
+    }
+
+    override fun onDestroy() {
+        disposable.dispose()
+        super.onDestroy()
     }
 
     fun setupToolbar(@IdRes toolbarId: Int) {
@@ -75,6 +91,10 @@ abstract class BaseFragment : Fragment() {
         navController?.popBackStack(navController?.graph!!.startDestination, inclusive)
     }
 
+    fun canProcessBackFromActivity(canBack: Boolean) {
+        EventBus.publish(ActivityBackPressed(canBack))
+    }
+
     fun navigateInside(@IdRes destId: Int) {
         view?.findNavController()?.navigate(destId)
     }
@@ -86,21 +106,31 @@ abstract class BaseFragment : Fragment() {
     fun navigateOutside(@IdRes navId: Int, @IdRes destId: Int) {
         Navigation.findNavController(requireActivity(), navId).navigate(destId)
         when (navId) {
-            R.id.nav_host_one -> EventBus.publish(NavigateToAnotherGraph(0))
-            R.id.nav_host_two -> EventBus.publish(NavigateToAnotherGraph(1))
-            R.id.nav_host_three -> EventBus.publish(NavigateToAnotherGraph(2))
+            R.id.nav_host_one -> EventBus.publish(OnNavigateToAnotherGraph(0))
+            R.id.nav_host_two -> EventBus.publish(OnNavigateToAnotherGraph(1))
+            R.id.nav_host_three -> EventBus.publish(OnNavigateToAnotherGraph(2))
         }
+        navController?.popBackStack()
     }
 
     fun navigateOutside(@IdRes navId: Int, @IdRes destId: Int, args: Bundle) {
         Navigation.findNavController(requireActivity(), navId).navigate(destId, args)
         when (navId) {
-            R.id.nav_host_one -> EventBus.publish(NavigateToAnotherGraph(0))
-            R.id.nav_host_two -> EventBus.publish(NavigateToAnotherGraph(1))
-            R.id.nav_host_three -> EventBus.publish(NavigateToAnotherGraph(2))
+            R.id.nav_host_one -> EventBus.publish(OnNavigateToAnotherGraph(0))
+            R.id.nav_host_two -> EventBus.publish(OnNavigateToAnotherGraph(1))
+            R.id.nav_host_three -> EventBus.publish(OnNavigateToAnotherGraph(2))
         }
+        navController?.popBackStack()
+    }
+
+    open fun onActivityBackPressed() {
+
     }
 
     fun handleDeepLink(intent: Intent) = navController?.handleDeepLink(intent) ?: false
 
+    fun addToDisposable(disposable: Disposable) {
+        this.disposable.remove(disposable)
+        this.disposable.add(disposable)
+    }
 }

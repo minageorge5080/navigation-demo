@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
-abstract  class BaseActivity  : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity() {
 
     private val disposable = CompositeDisposable()
 
@@ -28,7 +28,7 @@ abstract  class BaseActivity  : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        disposable.clear()
+        disposable.dispose()
         super.onDestroy()
     }
 }
