@@ -112,18 +112,6 @@ class MainActivity : BaseActivity(), ViewPager.OnPageChangeListener,
                 }
             }
         }
-        // if no fragments were popped
-//        if (!hadNestedFragments) {
-//            if (backStack.size > 1) {
-//                // remove current position from stack
-//                backStack.pop()
-//                // set the next item in stack as current
-//                viewPager.currentItem = backStack.peek()
-//
-//            } else super.onBackPressed()
-//        }
-
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -9,6 +9,7 @@ import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.navigation.ActivityNavigator
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
@@ -95,25 +96,30 @@ abstract class BaseFragment : Fragment() {
         EventBus.publish(ActivityBackPressed(canBack))
     }
 
-    fun navigateInside(@IdRes destId: Int) {
-        view?.findNavController()?.navigate(destId)
-    }
-
-    fun navigateInside(@IdRes destId: Int, args: Bundle) {
+    fun navigateInside(@IdRes destId: Int, args: Bundle? = null) {
         view?.findNavController()?.navigate(destId, args)
     }
 
-    fun navigateOutside(@IdRes navId: Int, @IdRes destId: Int) {
-        Navigation.findNavController(requireActivity(), navId).navigate(destId)
-        when (navId) {
-            R.id.nav_host_one -> EventBus.publish(OnNavigateToAnotherGraph(0))
-            R.id.nav_host_two -> EventBus.publish(OnNavigateToAnotherGraph(1))
-            R.id.nav_host_three -> EventBus.publish(OnNavigateToAnotherGraph(2))
-        }
-        navController?.popBackStack()
+    fun navigateToActivity(intent: Intent, args: Bundle? = null, popCurrent: Boolean = false) {
+        val activityNavigator = ActivityNavigator(context!!)
+        activityNavigator.navigate(
+            activityNavigator.createDestination().setIntent(intent),
+            args,
+            null,
+            null
+        )
+
+        if (popCurrent) activityNavigator.popBackStack()
     }
 
-    fun navigateOutside(@IdRes navId: Int, @IdRes destId: Int, args: Bundle) {
+    fun navigateToActivity(@IdRes destId: Int, args: Bundle? = null, popCurrent: Boolean = false) {
+        view?.findNavController()?.navigate(destId, args)
+        val activityNavigator = ActivityNavigator(context!!)
+        if (popCurrent) activityNavigator.popBackStack()
+    }
+
+
+    fun navigateOutside(@IdRes navId: Int, @IdRes destId: Int, args: Bundle? = null) {
         Navigation.findNavController(requireActivity(), navId).navigate(destId, args)
         when (navId) {
             R.id.nav_host_one -> EventBus.publish(OnNavigateToAnotherGraph(0))

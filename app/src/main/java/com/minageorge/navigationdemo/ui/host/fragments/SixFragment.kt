@@ -13,10 +13,10 @@ class SixFragment : BaseFragment() {
     override fun initFragment() {
         setupToolbar(R.id.toolbar_one)
         setupNavigation(R.id.nav_host_one)
+
         args = SixFragmentArgs.fromBundle(arguments!!)
 
         when (args.sourceType) {
-
             // opened from fragment 10 in nav 3
             1 -> {
                 canProcessBackFromActivity(false)
@@ -24,9 +24,7 @@ class SixFragment : BaseFragment() {
                     navigateOutside(R.id.nav_host_three, R.id.action_dest_nine_to_dest_ten)
                 }
             }
-
         }
-
     }
 
     override fun onActivityBackPressed() {
@@ -35,8 +33,6 @@ class SixFragment : BaseFragment() {
             1 -> {
                 navigateOutside(R.id.nav_host_three, R.id.action_dest_nine_to_dest_ten)
             }
-
         }
     }
-
 }
